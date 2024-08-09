@@ -22,10 +22,12 @@ DEBUG=0
 # Function to extract the server path from an rsync command 
 # and check if it is a path within the user's home folder
 check_rsync_command() {
-    local input="$1"
+    local input
+    input="$1"
     
     # Extract the last argument from the input
-    local path=$(echo "$input" | awk '{print $NF}')
+    local path
+    path=$(echo "$input" | awk '{print $NF}')
 
     # Check if the path contains a colon
     if [[ "$path" == *:* ]]; then
@@ -89,7 +91,7 @@ case "$SSH_ORIGINAL_COMMAND" in
             if [ $DEBUG -eq 1 ]; then
                 echo "Command is allowed"
             fi
-            eval $SSH_ORIGINAL_COMMAND
+            eval "$SSH_ORIGINAL_COMMAND"
         else
             # Reject the rsync command if the destination path is outside the user's home folder
             if [ $DEBUG -eq 1 ]; then
