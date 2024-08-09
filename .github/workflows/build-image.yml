@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Pull latest image
+        id: pull_image
         run: |
           latest_tag="docker.pkg.github.com/${{ inputs.image }}/${{ inputs.tag }}"
           echo "latest_tag=$latest_tag" >> "$GITHUB_ENV"
