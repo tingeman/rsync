@@ -37,11 +37,11 @@ jobs:
           
           # Check if the image exists
           if docker manifest inspect "$latest_tag" > /dev/null 2>&1; then
-            echo "::set-output name=image_exists::true"  
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
             docker pull "$latest_tag"
             echo "Image $latest_tag pulled successfully"
           else
-            echo "::set-output name=image_exists::false"
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
             echo "Image $latest_tag not found"
             echo "image_missing=true" >> result
           fi
