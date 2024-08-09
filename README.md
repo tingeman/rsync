@@ -1,6 +1,6 @@
 # RSYNC
 
-<!-- ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/atmoz/sftp/build.yml?logo=github) ![GitHub stars](https://img.shields.io/github/stars/atmoz/sftp?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/atmoz/sftp?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/atmoz/sftp?label=pulls&logo=docker) -->
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tingeman/rsync/build.yml?logo=github) ![GitHub stars](https://img.shields.io/github/stars/tingeman/rsync?logo=github) ![Docker Stars](https://img.shields.io/docker/stars/tingeman/rsync?label=stars&logo=docker) ![Docker Pulls](https://img.shields.io/docker/pulls/tingeman/rsync?label=pulls&logo=docker)
 
 ![OpenSSH logo](https://raw.githubusercontent.com/atmoz/sftp/master/openssh.png "Powered by OpenSSH")
 
@@ -54,12 +54,6 @@ User "foo" with password "pass" can login with sftp and upload files to a folder
 ## Logging in with SSH keys
 
 Mount public keys in the user's `.ssh/keys/` directory. All keys are automatically appended to `.ssh/authorized_keys` (you can't mount this file directly, because OpenSSH requires limited file permissions). In this example, we do not provide any password, so the user `foo` can only login with his SSH key. A folder called `upload` is created in the users home folder, with read and write permissions.
-
-To build, use:
-
-```
-docker build . -t tingeman/rsync
-```
 
 To start the container use:
 
