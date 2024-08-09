@@ -34,11 +34,21 @@ jobs:
 
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com \
             -u ${{ github.actor }} --password-stdin
-          docker pull "$latest_tag"
+          
+          if docker pull "$latest_tag"; then
+            echo "image_exists=true" >> $GITHUB_ENV
+            echo "Image $latest_tag pulled successfully"
+          else
+            echo "image_exists=false" >> $GITHUB_ENV
+            echo "Image $latest_tag not found"
+            echo "image_missing=true" >> result
+          fi
+          
           docker logout docker.pkg.github.com
 
-      - name: Check if git revision has changed
+      - name: Check if git revision has changed (skipped if image is missing)
         id: revision
+        if: ${{ env.image_exists }} == 'true'
         run: |
           revision="$(docker image inspect --format \
             '{{index .Config.Labels "org.opencontainers.image.revision"}}' \
@@ -52,8 +62,9 @@ jobs:
             echo "changed_revision=false" >> result
           fi
 
-      - name: Check for new updates
+      - name: Check for new updates (skipped if image is missing)
         id: updates
+        if: ${{ env.image_exists }} == 'true'
         run: |
           packages="$(docker run --rm --entrypoint=/bin/sh "$latest_tag" -c "${{ inputs.update-check }}")"
           echo "$packages"
