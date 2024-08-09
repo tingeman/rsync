@@ -37,11 +37,11 @@ jobs:
           
           # Check if the image exists
           if docker manifest inspect "$latest_tag" > /dev/null 2>&1; then
+            echo "::set-output name=image_exists::true"  
             docker pull "$latest_tag"
-            echo "image_exists=true" >> $GITHUB_ENV
             echo "Image $latest_tag pulled successfully"
           else
-            echo "image_exists=false" >> $GITHUB_ENV
+            echo "::set-output name=image_exists::false"
             echo "Image $latest_tag not found"
             echo "image_missing=true" >> result
           fi
@@ -54,7 +54,7 @@ jobs:
 
       - name: Check if git revision has changed (skipped if image is missing)
         id: revision
-        if: ${{ env.image_exists }} == 'true'
+        if: steps.pull_image.outputs.image_exists == 'true'
         run: |
           revision="$(docker image inspect --format \
             '{{index .Config.Labels "org.opencontainers.image.revision"}}' \
@@ -70,7 +70,7 @@ jobs:
 
       - name: Check for new updates (skipped if image is missing)
         id: updates
-        if: ${{ env.image_exists }} == 'true'
+        if: steps.pull_image.outputs.image_exists == 'true'
         run: |
           packages="$(docker run --rm --entrypoint=/bin/sh "$latest_tag" -c "${{ inputs.update-check }}")"
           echo "$packages"
