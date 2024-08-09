@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       detected: ${{ steps.result.outputs.detected }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -53,7 +54,7 @@ jobs:
 
       - name: Check if git revision has changed (skipped if image is missing)
         id: revision
-        if: steps.pull_image.outputs.image_missing == 'false'
+        if: steps.pull_image.outputs.image_exists == 'true'
         run: |
           revision="$(docker image inspect --format \
             '{{index .Config.Labels "org.opencontainers.image.revision"}}' \
@@ -69,7 +70,7 @@ jobs:
 
       - name: Check for new updates (skipped if image is missing)
         id: updates
-        if: steps.pull_image.outputs.image_missing == 'false'
+        if: steps.pull_image.outputs.image_exists == 'true'
         run: |
           packages="$(docker run --rm --entrypoint=/bin/sh "$latest_tag" -c "${{ inputs.update-check }}")"
           echo "$packages"
