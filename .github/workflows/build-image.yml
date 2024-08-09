@@ -35,9 +35,9 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com \
             -u ${{ github.actor }} --password-stdin
           
-          # Try to pull the image and handle the error gracefully
-          set -o pipefail
-          if docker pull "$latest_tag"; then
+          # Check if the image exists
+          if docker manifest inspect "$latest_tag" > /dev/null 2>&1; then
+            docker pull "$latest_tag"
             echo "image_exists=true" >> $GITHUB_ENV
             echo "Image $latest_tag pulled successfully"
           else
