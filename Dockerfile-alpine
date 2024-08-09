@@ -1,0 +1,25 @@
+FROM alpine:latest
+LABEL authors="Thomas Ingeman-Nielsen"
+
+# Steps done in one RUN layer:
+# - Install upgrades and new packages
+# - OpenSSH needs /var/run/sshd to run
+# - Remove generic host keys, entrypoint generates unique keys
+RUN apk update && apk upgrade && \
+    apk add bash shadow openssh-server-pam rsync && \
+    rm -rf /var/cache/apk/* && \
+    ln -s /usr/sbin/sshd.pam /usr/sbin/sshd && \
+    mkdir -p /var/run/sshd && \
+    rm -f /etc/ssh/ssh_host_*key*
+
+COPY files/validate-rsync.sh /opt/rsync/resources/validate-rsync.sh
+COPY files/sshd_config /etc/ssh/sshd_config
+COPY files/create-rsync-user /usr/local/bin/
+
+# copy entrypoint script and set is executable
+COPY files/entrypoint /entrypoint
+RUN chmod +x /entrypoint
+
+EXPOSE 22
+
+ENTRYPOINT ["/entrypoint"]
