@@ -45,6 +45,7 @@ jobs:
           fi
           
           docker logout docker.pkg.github.com
+        continue-on-error: true
 
       - name: Check if git revision has changed (skipped if image is missing)
         id: revision
