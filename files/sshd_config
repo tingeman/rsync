@@ -18,5 +18,5 @@ AllowTcpForwarding no
 PasswordAuthentication no    # yes to allow plain text password authentication
 PubkeyAuthentication yes
 
--# Enable this for more logs
+# Enable this for more logs
 # LogLevel VERBOSE
