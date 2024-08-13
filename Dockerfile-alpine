@@ -18,7 +18,11 @@ COPY files/create-rsync-user /usr/local/bin/
 
 # copy entrypoint script and set is executable
 COPY files/entrypoint /entrypoint
-RUN chmod +x /entrypoint
+
+# Set execution permissions
+RUN chmod +x /entrypoint \
+             /usr/local/bin/create-rsync-user \
+             /opt/rsync/resources/validate-rsync.sh
 
 EXPOSE 22
 
