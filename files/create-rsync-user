@@ -13,8 +13,8 @@ reDir='[^:]*'
 #reArgs="^($reUser)(:$rePass)(:e)?(:$reUid)?(:$reGid)?(:$reDir)?$"
 
 # Paths
-resourcesPath="/opt/rsync/resources"
-sshKeysPath="/opt/rsync/resources/ssh_keys"
+resourcesPath="/opt/rsync"
+sshKeysPath="/opt/rsync/ssh_keys"
 
 function log() {
     echo "[$0] $*"

@@ -12,7 +12,7 @@ RUN apt-get update && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
 
-COPY files/validate-rsync.sh /opt/rsync/resources/validate-rsync.sh
+COPY files/validate-rsync.sh /opt/rsync/validate-rsync.sh
 COPY files/sshd_config /etc/ssh/sshd_config
 COPY files/create-rsync-user /usr/local/bin/
 
@@ -22,7 +22,7 @@ COPY files/entrypoint /entrypoint
 # Set execution permissions
 RUN chmod +x /entrypoint \
              /usr/local/bin/create-rsync-user \
-             /opt/rsync/resources/validate-rsync.sh
+             /opt/rsync/validate-rsync.sh
 
 EXPOSE 22
 
