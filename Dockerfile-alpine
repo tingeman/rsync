@@ -12,6 +12,9 @@ RUN apk update && apk upgrade && \
     mkdir -p /var/run/sshd && \
     rm -f /etc/ssh/ssh_host_*key*
 
+# Create the directory if it doesn't exist
+RUN mkdir -p /opt/rsync/ssh_keys
+
 COPY files/validate-rsync.sh /opt/rsync/validate-rsync.sh
 COPY files/sshd_config /etc/ssh/sshd_config
 COPY files/create-rsync-user /usr/local/bin/
