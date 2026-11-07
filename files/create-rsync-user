@@ -27,13 +27,15 @@ function validateArg() {
     if [[ "$val" =~ ^$re$ ]]; then
         return 0
     else
+        if [ "$name" == "password" ]; then val="(hidden)"; fi
         log "ERROR: Invalid $name \"$val\", do not match required regex pattern: $re"
         return 1
     fi
 }
 
-log "Parsing user data: \"$1\""
 IFS=':' read -ra args <<< "$1"
+# Log only the user name: the rest of the line can hold a password (hash).
+log "Parsing user data for \"${args[0]}\""
 
 skipIndex=0
 chpasswdOptions=""
@@ -144,6 +146,9 @@ if [ -d "$userKeysQueuedDir" ]; then
 
     chown root:root "$userKeysAllowedFile"
     chmod 644 "$userKeysAllowedFile"
+
+    # Left behind by images before 2026.1 (user-owned, no longer used)
+    rm -f "$userSshDir/validate-rsync.sh"
 fi
 
 # Make sure dirs exists
