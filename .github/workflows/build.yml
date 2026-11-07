@@ -27,18 +27,6 @@ jobs:
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
-        with:
-          ignore_paths: tests/shunit2
-
-  alpine:
-    needs: verify
-    uses: ./.github/workflows/build-image.yml
-    with:
-      containerfile: Dockerfile-alpine
-      image: "$GITHUB_REPOSITORY"
-      tag: alpine
-      update-check: "apk update &>/dev/null && apk version -q -l '>'"
-    secrets: inherit
 
   debian:
     needs: verify

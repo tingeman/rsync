@@ -11,7 +11,6 @@ reArgSkip='^([[:blank:]]*#.*|[[:blank:]]*)$' # comment or empty line
 userConfPath="/etc/rsync/users.conf"
 userConfPathLegacy="/etc/rsync-users.conf"
 userConfFinalPath="/var/run/rsync/users.conf"
-resourcesPath="/opt/rsync/resources"
 
 function log() {
     echo "[$0] $*" >&2
