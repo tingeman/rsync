@@ -13,7 +13,6 @@ reDir='[^:]*'
 #reArgs="^($reUser)(:$rePass)(:e)?(:$reUid)?(:$reGid)?(:$reDir)?$"
 
 # Paths
-resourcesPath="/opt/rsync"
 sshKeysPath="/opt/rsync/ssh_keys"
 
 function log() {
@@ -96,7 +95,7 @@ if [ -d "$sshKeysPath/$user" ]; then
 
     # if sshKeysPath contains a directory with the user's name, and the directory contains files
     # then copy the files to the user's .ssh/keys directory
-    if [ "$(ls -A $sshKeysPath/$user)" ]; then
+    if [ "$(ls -A "$sshKeysPath/$user")" ]; then
         # The directory contains files
         # so copy the keys to the user's .ssh/keys directory
 
@@ -105,42 +104,46 @@ if [ -d "$sshKeysPath/$user" ]; then
             mkdir -p "$userKeysQueuedDir"
         fi
 
-        # Copy all files from sshKeysPath to userKeysQueuedDir
+        # Copy all files from sshKeysPath to userKeysQueuedDir.
+        # Root-owned and not writable by the user.
         cp -r "$sshKeysPath/$user"/* "$userKeysQueuedDir"
-        chown -R "$uid" "$userKeysQueuedDir"
-        chmod 700 "$userKeysQueuedDir"
+        chown -R root:root "$userKeysQueuedDir"
+        chmod 755 "$userKeysQueuedDir"
+        find "$userKeysQueuedDir" -type d -exec chmod 755 {} +
+        find "$userKeysQueuedDir" -type f -exec chmod 644 {} +
     fi
 fi
 
 # Loop through each key file in the user's .ssh/keys directory
-# and append the key to the user's authorized_keys file
-# with the command restriction to only allow rsync
+# and append the key to the user's authorized_keys file.
+# The rsync-only restriction itself is the ForceCommand in sshd_config;
+# "restrict" turns off forwarding, pty and ~/.ssh/rc for each key.
 if [ -d "$userKeysQueuedDir" ]; then
     userKeysAllowedFileTmp="$(mktemp)"
-    userKeysAllowedFile="/home/$user/.ssh/authorized_keys"
+    userSshDir="/home/$user/.ssh"
+    userKeysAllowedFile="$userSshDir/authorized_keys"
 
-    # For each key, append to the authorized_keys file
-    # and restrict ssh access using the validate-rsync.sh script
+    # .ssh and authorized_keys are owned by root and not writable by the user,
+    # so the user can't change what restricts them (sshd StrictModes accepts root).
+    chown root:root "$userSshDir"
+    chmod 755 "$userSshDir"
 
-    # Define the command restriction
-    command_restriction="command=\"/home/$user/.ssh/validate-rsync.sh\",no-port-forwarding,no-X11-forwarding,no-pty"
-
-    # Loop through each public key file and prepend the command restriction
+    # Loop through each public key file and prepend the key options
     for publickey in "$userKeysQueuedDir"/*.pub; do
-        while IFS= read -r key; do
-            echo "$command_restriction $key" >> "$userKeysAllowedFileTmp"
+        [ -f "$publickey" ] || continue
+        while IFS= read -r key || [ -n "$key" ]; do
+            # Skip empty lines and comments
+            [[ "$key" =~ ^[[:blank:]]*(#.*)?$ ]] && continue
+            echo "restrict $key" >> "$userKeysAllowedFileTmp"
         done < "$publickey"
     done
 
     # Remove duplicate keys
     sort < "$userKeysAllowedFileTmp" | uniq > "$userKeysAllowedFile"
+    rm -f "$userKeysAllowedFileTmp"
 
-    chown "$uid" "$userKeysAllowedFile"
-    chmod 600 "$userKeysAllowedFile"
-
-    cp $resourcesPath/validate-rsync.sh /home/$user/.ssh/validate-rsync.sh
-    chown $user /home/$user/.ssh/validate-rsync.sh
-    chmod 500 /home/$user/.ssh/validate-rsync.sh
+    chown root:root "$userKeysAllowedFile"
+    chmod 644 "$userKeysAllowedFile"
 fi
 
 # Make sure dirs exists

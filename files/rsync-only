@@ -1,0 +1,9 @@
+#!/bin/sh
+# Forced command for every SSH session (ForceCommand in /etc/ssh/sshd_config).
+# rrsync reads the client's command from SSH_ORIGINAL_COMMAND, parses the rsync
+# server arguments without a shell, roots every path (including option paths)
+# at the user's home folder and refuses anything that is not an rsync server
+# run. -munge (rsync --munge-links on the server) stops symlink escapes out
+# of the home folder. rrsync allows one session per user at a time (its
+# default lock on DIR).
+exec /usr/bin/rrsync -munge "$HOME"

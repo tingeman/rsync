@@ -12,6 +12,17 @@ UseDNS no
 PermitRootLogin no
 X11Forwarding no
 AllowTcpForwarding no
+AllowAgentForwarding no
+AllowStreamLocalForwarding no
+PermitTunnel no
+DisableForwarding yes
+PermitUserRC no
+PermitTTY no
+PermitUserEnvironment no
+
+# rsync only: every session runs rrsync rooted at the user's home folder,
+# whatever command the client asks for or authorized_keys says.
+ForceCommand /usr/local/bin/rsync-only
 
 # Allow both password and public key authentication
 # Change as needed
